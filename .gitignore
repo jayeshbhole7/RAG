@@ -1,6 +1,0 @@
-.env
-myenv/
-.venv/
-*.pyc
-.vscode/settings.json
-tempCodeRunnerFile.py

@@ -1,133 +1,140 @@
-import os
+# from langchain_community.chat_models import ChatCohere
+from langchain_cohere import ChatCohere
+from langchain_openai import ChatOpenAI
+from langchain.chains import RetrievalQA
+from langchain_community.vectorstores import FAISS
+from langchain_cohere import CohereEmbeddings
 import json
 import PyPDF2
-import shutil
-import time
-from dotenv import load_dotenv
-from langchain_community.vectorstores import FAISS
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_core.documents import Document
-from langchain_cohere import CohereEmbeddings
 import streamlit as st
+import os
+from dotenv import load_dotenv
+    
+st.set_page_config("ChatSDK Fund","💬")
 
-# Set the Cohere API key and model directly
-COHERE_API_KEY = "Lqns8lzYYresnXB7QZ3Jc54zj8ri6X1Z6SDpgbZK"
-COHERE_MODEL = "embed-english-v3.0"
+load_dotenv()
 
-# Initialize Cohere embeddings
+# API Keys
+# OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+COHERE_API_KEY = os.getenv('COHERE_API_KEY')
+
+# Using Cohere's embed-english-v3.0 embedding model
 embeddings = CohereEmbeddings(cohere_api_key="Lqns8lzYYresnXB7QZ3Jc54zj8ri6X1Z6SDpgbZK", model="embed-english-v3.0")
 
 
-# Set up Streamlit
-st.set_page_config(page_title="Upload Files", page_icon="📤")
+# For OpenAI's gpt-3.5-turbo llm
+# llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo" openai_api_key=OPENAI_API_KEY)
 
-# Function to read PDF
+# For Cohere's command-r llm
+llm = ChatCohere(temperature=0, cohere_api_key="Lqns8lzYYresnXB7QZ3Jc54zj8ri6X1Z6SDpgbZK", model="command-r")
+
+
+# For reading PDFs and returning text string
 def read_pdf(files):
-    file_content = ""
+    file_content=""
     for file in files:
+        # Create a PDF file reader object
         pdf_reader = PyPDF2.PdfReader(file)
+        # Get the total number of pages in the PDF
         num_pages = len(pdf_reader.pages)
+        # Iterate through each page and extract text
         for page_num in range(num_pages):
+            # Get the page object
             page = pdf_reader.pages[page_num]
             file_content += page.extract_text()
     return file_content
 
-# Store index function
-def store_index(uploaded_file, index_option, file_names):
-    try:
-        if os.path.exists(f"db/{index_option}/index.faiss"):
-            st.toast(f"Storing in existing index {index_option}...", icon="🗂️")
-            with open(f'db/{index_option}/desc.json', 'r') as openfile:
-                description = json.load(openfile)
-                description["file_names"] = file_names + description["file_names"]
-            with st.spinner("Processing..."):
-                file_content = read_pdf(uploaded_file)
-                book_documents = recursive_text_splitter.create_documents([file_content])
-                book_documents = [Document(page_content=text.page_content.replace("\n", " ").replace(".", "").replace("-", "")) for text in book_documents]
-                docsearch = FAISS.from_documents(book_documents, embeddings)
-                old_docsearch = FAISS.load_local(f"db/{index_option}", embeddings, allow_dangerous_deserialization=True)
-                docsearch.merge_from(old_docsearch)
-                docsearch.save_local(f"db/{index_option}")
-                with open(f"db/{index_option}/desc.json", "w") as outfile:
-                    json.dump(description, outfile)
-        else:
-            st.toast(f"Storing in new index {index_option}...", icon="🗂️")
-            with st.spinner("Processing..."):
-                file_content = read_pdf(uploaded_file)
-                book_documents = recursive_text_splitter.create_documents([file_content])
-                book_documents = [Document(page_content=text.page_content.replace("\n", " ").replace(".", "").replace("-", "")) for text in book_documents]
-                docsearch = FAISS.from_documents(book_documents, embeddings)
-                docsearch.save_local(f"db/{index_option}")
-                with open(f'db/{index_option}/desc.json', 'r') as openfile:
-                    description = json.load(openfile)
-                    description["file_names"] = file_names + description["file_names"]
-                with open(f"db/{index_option}/desc.json", "w") as outfile:
-                    json.dump(description, outfile)
-        st.success(f"Successfully added to {description['name']}!")
-    except Exception as e:
-        st.error(f"Error occurred: {e}")
 
-# Recursive text splitter
-recursive_text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=2000,
-    chunk_overlap=20)
+#-----------------------------------------------------------#
+#------------------------💬 CHATBOT -----------------------#
+#----------------------------------------------------------#
+def chatbot():
+    st.subheader("Ask questions from the PDFs")
+    st.markdown("<br>", unsafe_allow_html=True)
+    # Check if it is empty
+    if st.session_state.book_docsearch:   
+        prompt = st.chat_input("Say something")
+        
+        # Write previous converstions
+        for i in st.session_state.conversation_chatbot:
+            user_msg = st.chat_message("human", avatar="🐒")
+            user_msg.write(i[0])
+            computer_msg = st.chat_message("ai", avatar="🧠")
+            computer_msg.write(i[1])
+            
+        if prompt:                    
+            user_text = f'''{prompt}'''
+            user_msg = st.chat_message("human", avatar="🐒")
+            user_msg.write(user_text)
 
-# Initialize session state
+            with st.spinner("Getting Answer..."):
+                # No of chunks the search should retrieve from the db
+                chunks_to_retrieve = 5
+                retriever = st.session_state.book_docsearch.as_retriever(search_type="similarity", search_kwargs={"k":chunks_to_retrieve})
+
+                ## RetrievalQA Chain ##
+                qa = RetrievalQA.from_llm(llm=llm, retriever=retriever, verbose=True)
+                answer = qa({"query": prompt})["result"]
+                computer_text = f'''{answer}'''
+                computer_msg = st.chat_message("ai", avatar="🧠") 
+                computer_msg.write(computer_text)
+                
+                # Showing chunks with score
+                doc_score = st.session_state.book_docsearch.similarity_search_with_score(prompt, k=chunks_to_retrieve)
+                with st.popover("See chunks..."):
+                    st.write(doc_score)
+                # Adding current conversation_chatbot to the list.
+                st.session_state.conversation_chatbot.append((prompt, answer))   
+    else:
+        st.warning("Please upload a file")
+
+
+            
+# For initialization of session variables
 def initial(flag=False):
-    path = "db"
+    path="db"
     if 'existing_indices' not in st.session_state or flag:
         st.session_state.existing_indices = [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
+    if ('selected_option' not in st.session_state) or flag:
+        try:
+            st.session_state.selected_option = st.session_state.existing_indices[0]
+        except:
+            st.session_state.selected_option = None
+    
+    if 'conversation_chatbot' not in st.session_state:
+        st.session_state.conversation_chatbot = []
+    if 'book_docsearch' not in st.session_state:
+        st.session_state.book_docsearch = None
+    
 
-# Main function
 def main():
-    initial()
-    st.title("📤 Upload new files")
-    uploaded_file = st.file_uploader("Upload PDF", type="pdf", accept_multiple_files=True)
-    if uploaded_file:
-        file_names = [file_name.name for file_name in uploaded_file]
-        st.subheader("Select Index")
-        st.caption("Create and select a new index or use an existing one")
-        with st.popover("➕ Create new index"):
-            form = st.form("new_index")
-            index_name = form.text_input("Enter Index Name*")
-            about = form.text_area("Enter description for Index")
-            submitted = form.form_submit_button("Submit")
-            if submitted:
-                os.makedirs(f"db/{index_name}")
-                description = {
-                    "name": index_name,
-                    "about": about,
-                    "file_names": []
-                }
-                with open(f"db/{index_name}/desc.json", "w") as f:
-                    json.dump(description, f)
-                st.session_state.existing_indices = [index_name] + st.session_state.existing_indices
-                st.success(f"New Index {index_name} created successfully")
-        index_option = st.selectbox('Add to existing Indices', st.session_state.existing_indices)
-        if st.button("Store"):
-            store_index(uploaded_file, index_option, file_names)
-    st.subheader("Stored Indices")
-    with st.expander("See existing indices"):
-        if len(st.session_state.existing_indices) == 0:
-            st.warning("No existing indices. Please upload a pdf to start.")
-        for index in st.session_state.existing_indices:
-            if os.path.exists(f"db/{index}/desc.json"):
-                col1, col2 = st.columns([6, 1])
-                with col1:
-                    with open(f"db/{index}/desc.json", "r") as openfile:
-                        description = json.load(openfile)
-                        file_list = ",".join(description["file_names"])
-                        st.markdown(f"<h4>{index}</h4>", unsafe_allow_html=True)
-                        st.caption(f"Desc: {description['about']}")
-                        st.caption(f"Files: {file_list}")
-                with col2:
-                    t = st.button("🗑️", key=index)
-                    if t:
-                        shutil.rmtree(f"db/{index}")
-                        initial(flag=True)
-                        st.toast(f"{index} deleted", icon='🗑️')
-                        time.sleep(1)
-                        st.rerun()
+    initial(True)
+    # Streamlit UI
+    st.title("💰 Mutual Fund Chatbot")
+    
+    # For showing the index selector
+    file_list=[]
+    for index in st.session_state.existing_indices:
+        with open(f"db/{index}/desc.json", "r") as openfile:
+            description = json.load(openfile)
+            file_list.append(",".join(description["file_names"]))
 
-if __name__ == "__main__":
-    main()
+    with st.popover("Select index", help="👉 Select the datastore from which data will be retrieved"):
+        st.session_state.selected_option = st.radio("Select a Document...", st.session_state.existing_indices, captions=file_list, index=0)
+
+    st.write(f"*Selected index* : **:orange[{st.session_state.selected_option}]**")
+    
+    # Load the selected index from local storage
+    if st.session_state.selected_option:
+        st.session_state.book_docsearch = FAISS.load_local(f"db/{st.session_state.selected_option}", embeddings, allow_dangerous_deserialization=True)
+        # Call the chatbot function
+        chatbot()
+    else:
+        st.warning("⚠️ No index present. Please add a new index.")
+        # st.page_link("pages/Upload_Files.py", label="Upload Files", icon="⬆️")
+            
+            
+ 
+
+            
+main()

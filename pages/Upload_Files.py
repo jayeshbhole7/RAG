@@ -19,10 +19,10 @@ from langchain_cohere import CohereEmbeddings
 st.set_page_config("Upload Files", "📤")
 
 load_dotenv()
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+# OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 COHERE_API_KEY = os.getenv('COHERE_API_KEY')
 
-embeddings = CohereEmbeddings(cohere_api_key="5QFvOeHFAKVK2okJ9LxSQoiNEpI0pcxuRRCTtMPn", model="embed-english-v3.0")
+embeddings = CohereEmbeddings(cohere_api_key="Lqns8lzYYresnXB7QZ3Jc54zj8ri6X1Z6SDpgbZK", model="embed-english-v3.0")
 
 
 def read_pdf(files):

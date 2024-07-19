@@ -88,7 +88,7 @@ embeddings = CohereEmbeddings(cohere_api_key="Lqns8lzYYresnXB7QZ3Jc54zj8ri6X1Z6S
 
 
 # For OpenAI's gpt-3.5-turbo llm
-llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo", openai_api_key="AIzaSyCcw80TULxH1WieGfYMlDpBWyg8B4LPoDU")
+# llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo", openai_api_key="AIzaSyCcw80TULxH1WieGfYMlDpBWyg8B4LPoDU")
 
 # For Cohere's command-r llm
 llm = ChatCohere(temperature=1, cohere_api_key="Lqns8lzYYresnXB7QZ3Jc54zj8ri6X1Z6SDpgbZK", model="command-r")

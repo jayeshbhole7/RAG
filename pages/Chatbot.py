@@ -1,99 +1,224 @@
-# from langchain_community.chat_models import ChatCohere
-from langchain_cohere import ChatCohere
-from langchain_openai import ChatOpenAI
+# # from langchain_community.chat_models import ChatCohere
+# from langchain_cohere import ChatCohere
+# # from langchain_openai import ChatOpenAI
+# import google.generativeai as genai
+# from langchain.chains import RetrievalQA
+# from langchain_community.vectorstores import FAISS
+# from langchain_cohere import CohereEmbeddings
+# import json
+# import PyPDF2
+# import streamlit as st
+# import os
+# from dotenv import load_dotenv
+    
+# st.set_page_config("ChatSDK Fund","💬")
+
+# load_dotenv()
+
+# # API Keys
+# # OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+# COHERE_API_KEY = os.getenv('igDGm4vYnbDyrHMdx4By2oCXwZ1pSlHtWg2547Hs')
+# GEMINI_API_KEY = os.getenv('AIzaSyDKMP-6mrJ_2MuCaMbiW849kpk4QFwBUzI')
+
+# # Using Cohere's embed-english-v3.0 embedding model
+# embeddings = CohereEmbeddings(cohere_api_key=COHERE_API_KEY, model="embed-english-v3.0")
+
+
+# # For OpenAI's gpt-3.5-turbo llm
+# # llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo" openai_api_key=OPENAI_API_KEY)
+
+# # For Cohere's command-r llm
+# llm = ChatCohere(temperature=0, cohere_api_key=COHERE_API_KEY, model="command-r")
+
+
+# # For reading PDFs and returning text string
+# def read_pdf(files):
+#     file_content=""
+#     for file in files:
+#         # Create a PDF file reader object
+#         pdf_reader = PyPDF2.PdfReader(file)
+#         # Get the total number of pages in the PDF
+#         num_pages = len(pdf_reader.pages)
+#         # Iterate through each page and extract text
+#         for page_num in range(num_pages):
+#             # Get the page object
+#             page = pdf_reader.pages[page_num]
+#             file_content += page.extract_text()
+#     return file_content
+
+
+# #-----------------------------------------------------------#
+# #------------------------💬 CHATBOT -----------------------#
+# #----------------------------------------------------------#
+# def chatbot():
+#     st.subheader("Ask questions from the PDFs")
+#     st.markdown("<br>", unsafe_allow_html=True)
+#     # Check if it is empty
+#     if st.session_state.book_docsearch:   
+#         prompt = st.chat_input("Say something")
+        
+#         # Write previous converstions
+#         for i in st.session_state.conversation_chatbot:
+#             user_msg = st.chat_message("human", avatar="🐒")
+#             user_msg.write(i[0])
+#             computer_msg = st.chat_message("ai", avatar="🧠")
+#             computer_msg.write(i[1])
+            
+#         if prompt:                    
+#             user_text = f'''{prompt}'''
+#             user_msg = st.chat_message("human", avatar="🐒")
+#             user_msg.write(user_text)
+
+#             with st.spinner("Getting Answer..."):
+#                 # No of chunks the search should retrieve from the db
+#                 chunks_to_retrieve = 5
+#                 retriever = st.session_state.book_docsearch.as_retriever(search_type="similarity", search_kwargs={"k":chunks_to_retrieve})
+
+#                 ## RetrievalQA Chain ##
+#                 qa = RetrievalQA.from_llm(llm=llm, retriever=retriever, verbose=True)
+#                 answer = qa({"query": prompt})["result"]
+#                 computer_text = f'''{answer}'''
+#                 computer_msg = st.chat_message("ai", avatar="🧠") 
+#                 computer_msg.write(computer_text)
+                
+#                 # Showing chunks with score
+#                 doc_score = st.session_state.book_docsearch.similarity_search_with_score(prompt, k=chunks_to_retrieve)
+#                 with st.popover("See chunks..."):
+#                     st.write(doc_score)
+#                 # Adding current conversation_chatbot to the list.
+#                 st.session_state.conversation_chatbot.append((prompt, answer))   
+#     else:
+#         st.warning("Please upload a file")
+
+
+            
+# # For initialization of session variables
+# def initial(flag=False):
+#     path="db"
+#     if 'existing_indices' not in st.session_state or flag:
+#         st.session_state.existing_indices = [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
+#     if ('selected_option' not in st.session_state) or flag:
+#         try:
+#             st.session_state.selected_option = st.session_state.existing_indices[0]
+#         except:
+#             st.session_state.selected_option = None
+    
+#     if 'conversation_chatbot' not in st.session_state:
+#         st.session_state.conversation_chatbot = []
+#     if 'book_docsearch' not in st.session_state:
+#         st.session_state.book_docsearch = None
+    
+
+# def main():
+#     initial(True)
+#     # Streamlit UI
+#     st.title("💰 Mutual Fund Chatbot")
+    
+#     # For showing the index selector
+#     file_list=[]
+#     for index in st.session_state.existing_indices:
+#         with open(f"db/{index}/desc.json", "r") as openfile:
+#             description = json.load(openfile)
+#             file_list.append(",".join(description["file_names"]))
+
+#     with st.popover("Select index", help="👉 Select the datastore from which data will be retrieved"):
+#         st.session_state.selected_option = st.radio("Select a Document...", st.session_state.existing_indices, captions=file_list, index=0)
+
+#     st.write(f"*Selected index* : **:orange[{st.session_state.selected_option}]**")
+    
+#     # Load the selected index from local storage
+#     if st.session_state.selected_option:
+#         st.session_state.book_docsearch = FAISS.load_local(f"db/{st.session_state.selected_option}", embeddings, allow_dangerous_deserialization=True)
+#         # Call the chatbot function
+#         chatbot()
+#     else:
+#         st.warning("⚠️ No index present. Please add a new index.")
+#         # st.page_link("pages/Upload_Files.py", label="Upload Files", icon="⬆️")
+            
+            
+ 
+
+            
+# main()
+
 from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import FAISS
 from langchain_cohere import CohereEmbeddings
+import google.generativeai as genai
 import json
 import PyPDF2
 import streamlit as st
 import os
 from dotenv import load_dotenv
-    
-st.set_page_config("ChatSDK Fund","💬")
+
+st.set_page_config("ChatSDK Fund", "💬")
 
 load_dotenv()
 
-# API Keys
-# OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-COHERE_API_KEY = os.getenv('igDGm4vYnbDyrHMdx4By2oCXwZ1pSlHtWg2547Hs')
+COHERE_API_KEY = os.getenv('igDGm4vYnbDyrHMdx4By2oCXwZ1pSlHtWg2547Hs')  # Use your actual API key
 GEMINI_API_KEY = os.getenv('AIzaSyDKMP-6mrJ_2MuCaMbiW849kpk4QFwBUzI')
+GEMINI_MODEL = "models/chat-bison-001"  # Choose appropriate Gemini model
 
-# Using Cohere's embed-english-v3.0 embedding model
 embeddings = CohereEmbeddings(cohere_api_key=COHERE_API_KEY, model="embed-english-v3.0")
 
+# Function to generate text using Gemini API
+def generate_text_with_gemini(prompt):
+    genai.configure(api_key=GEMINI_API_KEY)
+    response = genai.generate_text(
+        model=GEMINI_MODEL,
+        prompt=prompt,
+        temperature=0.0  # Adjust for creativity
+    )
+    return response.result
 
-# For OpenAI's gpt-3.5-turbo llm
-# llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo" openai_api_key=OPENAI_API_KEY)
-
-# For Cohere's command-r llm
-llm = ChatCohere(temperature=0, cohere_api_key=COHERE_API_KEY, model="command-r")
-
-
-# For reading PDFs and returning text string
+# Function to read PDFs efficiently
 def read_pdf(files):
-    file_content=""
+    file_content = ""
     for file in files:
-        # Create a PDF file reader object
-        pdf_reader = PyPDF2.PdfReader(file)
-        # Get the total number of pages in the PDF
-        num_pages = len(pdf_reader.pages)
-        # Iterate through each page and extract text
-        for page_num in range(num_pages):
-            # Get the page object
-            page = pdf_reader.pages[page_num]
-            file_content += page.extract_text()
+        with open(file, 'rb') as pdf_file:  
+            pdf_reader = PyPDF2.PdfReader(pdf_file)
+            file_content += "".join(page.extract_text() for page in pdf_reader.pages)
     return file_content
 
-
-#-----------------------------------------------------------#
-#------------------------💬 CHATBOT -----------------------#
-#----------------------------------------------------------#
+# Chatbot function
 def chatbot():
     st.subheader("Ask questions from the PDFs")
     st.markdown("<br>", unsafe_allow_html=True)
-    # Check if it is empty
-    if st.session_state.book_docsearch:   
+
+    if st.session_state.book_docsearch:
         prompt = st.chat_input("Say something")
-        
-        # Write previous converstions
+
         for i in st.session_state.conversation_chatbot:
             user_msg = st.chat_message("human", avatar="🐒")
             user_msg.write(i[0])
             computer_msg = st.chat_message("ai", avatar="🧠")
             computer_msg.write(i[1])
-            
-        if prompt:                    
-            user_text = f'''{prompt}'''
+
+        if prompt:
+            user_text = f"{prompt}"
             user_msg = st.chat_message("human", avatar="🐒")
             user_msg.write(user_text)
 
             with st.spinner("Getting Answer..."):
-                # No of chunks the search should retrieve from the db
                 chunks_to_retrieve = 5
-                retriever = st.session_state.book_docsearch.as_retriever(search_type="similarity", search_kwargs={"k":chunks_to_retrieve})
-
-                ## RetrievalQA Chain ##
-                qa = RetrievalQA.from_llm(llm=llm, retriever=retriever, verbose=True)
-                answer = qa({"query": prompt})["result"]
-                computer_text = f'''{answer}'''
-                computer_msg = st.chat_message("ai", avatar="🧠") 
+                retriever = st.session_state.book_docsearch.as_retriever(search_type="similarity", search_kwargs={"k": chunks_to_retrieve})
+                qa = RetrievalQA.from_chain_type(llm=generate_text_with_gemini, chain_type="stuff", retriever=retriever, verbose=True)
+                answer = qa({"query": prompt})
+                computer_text = f"{answer}"
+                computer_msg = st.chat_message("ai", avatar="🧠")
                 computer_msg.write(computer_text)
-                
-                # Showing chunks with score
-                doc_score = st.session_state.book_docsearch.similarity_search_with_score(prompt, k=chunks_to_retrieve)
-                with st.popover("See chunks..."):
-                    st.write(doc_score)
-                # Adding current conversation_chatbot to the list.
-                st.session_state.conversation_chatbot.append((prompt, answer))   
+
+                with st.expander("See relevant chunks:"):
+                    st.write(st.session_state.book_docsearch.similarity_search_with_score(prompt, k=chunks_to_retrieve))
+
+                st.session_state.conversation_chatbot.append((prompt, answer))
     else:
         st.warning("Please upload a file")
 
 
-            
-# For initialization of session variables
+# Initialization of session variables
 def initial(flag=False):
-    path="db"
+    path = "db"
     if 'existing_indices' not in st.session_state or flag:
         st.session_state.existing_indices = [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
     if ('selected_option' not in st.session_state) or flag:
@@ -101,41 +226,31 @@ def initial(flag=False):
             st.session_state.selected_option = st.session_state.existing_indices[0]
         except:
             st.session_state.selected_option = None
-    
+
     if 'conversation_chatbot' not in st.session_state:
         st.session_state.conversation_chatbot = []
     if 'book_docsearch' not in st.session_state:
         st.session_state.book_docsearch = None
-    
 
+# Main function
 def main():
     initial(True)
-    # Streamlit UI
     st.title("💰 Mutual Fund Chatbot")
-    
-    # For showing the index selector
-    file_list=[]
+    file_list = []
     for index in st.session_state.existing_indices:
         with open(f"db/{index}/desc.json", "r") as openfile:
             description = json.load(openfile)
             file_list.append(",".join(description["file_names"]))
 
-    with st.popover("Select index", help="👉 Select the datastore from which data will be retrieved"):
+    with st.sidebar.expander("Select index"):
         st.session_state.selected_option = st.radio("Select a Document...", st.session_state.existing_indices, captions=file_list, index=0)
 
     st.write(f"*Selected index* : **:orange[{st.session_state.selected_option}]**")
-    
-    # Load the selected index from local storage
+
     if st.session_state.selected_option:
         st.session_state.book_docsearch = FAISS.load_local(f"db/{st.session_state.selected_option}", embeddings, allow_dangerous_deserialization=True)
-        # Call the chatbot function
         chatbot()
     else:
         st.warning("⚠️ No index present. Please add a new index.")
-        # st.page_link("pages/Upload_Files.py", label="Upload Files", icon="⬆️")
-            
-            
- 
 
-            
 main()

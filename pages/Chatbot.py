@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-# from langchain_community.chat_models import ChatCohere
->>>>>>> fa06baf5c9b15b1090dc46ff202d480bd783e3f5
 from langchain_cohere import ChatCohere
 from langchain_openai import ChatOpenAI
 from langchain.chains import RetrievalQA
@@ -12,7 +8,6 @@ import PyPDF2
 import streamlit as st
 import os
 from dotenv import load_dotenv
-<<<<<<< HEAD
 
 st.set_page_config("ChatSDK Fund","💬")
 
@@ -38,8 +33,6 @@ def read_pdf(files):
 
         pdf_reader = PyPDF2.PdfReader(file)
 
-=======
-    
 st.set_page_config("ChatSDK Fund","💬")
 
 load_dotenv()
@@ -66,15 +59,9 @@ def read_pdf(files):
         # Create a PDF file reader object
         pdf_reader = PyPDF2.PdfReader(file)
         # Get the total number of pages in the PDF
->>>>>>> fa06baf5c9b15b1090dc46ff202d480bd783e3f5
         num_pages = len(pdf_reader.pages)
         # Iterate through each page and extract text
         for page_num in range(num_pages):
-<<<<<<< HEAD
-
-=======
-            # Get the page object
->>>>>>> fa06baf5c9b15b1090dc46ff202d480bd783e3f5
             page = pdf_reader.pages[page_num]
             file_content += page.extract_text()
     return file_content
@@ -86,34 +73,27 @@ def read_pdf(files):
 def chatbot():
     st.subheader("Ask questions from the PDFs")
     st.markdown("<br>", unsafe_allow_html=True)
-<<<<<<< HEAD
 
     if st.session_state.book_docsearch:   
         prompt = st.chat_input("Say something")
 
-        
-=======
+       
     # Check if it is empty
     if st.session_state.book_docsearch:   
         prompt = st.chat_input("Say something")
         
         # Write previous converstions
->>>>>>> fa06baf5c9b15b1090dc46ff202d480bd783e3f5
         for i in st.session_state.conversation_chatbot:
             user_msg = st.chat_message("human", avatar="🐒")
             user_msg.write(i[0])
             computer_msg = st.chat_message("ai", avatar="🧠")
             computer_msg.write(i[1])
-<<<<<<< HEAD
 
-=======
-            
->>>>>>> fa06baf5c9b15b1090dc46ff202d480bd783e3f5
         if prompt:                    
             user_text = f'''{prompt}'''
             user_msg = st.chat_message("human", avatar="🐒")
             user_msg.write(user_text)
-<<<<<<< HEAD
+
 
             with st.spinner("Getting Answer..."):
 
@@ -132,16 +112,12 @@ def chatbot():
                 with st.popover("See chunks..."):
                     st.write(doc_score)
                 # listing conversations
-                st.session_state.conversation_chatbot.append((prompt, answer))   
-    else:
+                st.session_state.conversation_chatbot.append((prompt, answer))
+
+    elif not st.session_state.book_docsearch:
         st.warning("Please upload a file")
-
-
-
-
-=======
-
-            with st.spinner("Getting Answer..."):
+        
+        with st.spinner("Getting Answer..."):
                 # No of chunks the search should retrieve from the db
                 chunks_to_retrieve = 5
                 retriever = st.session_state.book_docsearch.as_retriever(search_type="similarity", search_kwargs={"k":chunks_to_retrieve})
@@ -158,14 +134,13 @@ def chatbot():
                 with st.popover("See chunks..."):
                     st.write(doc_score)
                 # Adding current conversation_chatbot to the list.
-                st.session_state.conversation_chatbot.append((prompt, answer))   
+                st.session_state.conversation_chatbot.append((prompt, answer))
     else:
         st.warning("Please upload a file")
 
 
             
 # For initialization of session variables
->>>>>>> fa06baf5c9b15b1090dc46ff202d480bd783e3f5
 def initial(flag=False):
     path="db"
     if 'existing_indices' not in st.session_state or flag:
@@ -175,17 +150,11 @@ def initial(flag=False):
             st.session_state.selected_option = st.session_state.existing_indices[0]
         except:
             st.session_state.selected_option = None
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> fa06baf5c9b15b1090dc46ff202d480bd783e3f5
     if 'conversation_chatbot' not in st.session_state:
         st.session_state.conversation_chatbot = []
     if 'book_docsearch' not in st.session_state:
         st.session_state.book_docsearch = None
-<<<<<<< HEAD
-
 
 def main():
     initial(True)
@@ -199,8 +168,6 @@ def main():
             description = json.load(openfile)
             file_list.append(",".join(description["file_names"]))
 
-=======
-    
 
 def main():
     initial(True)
@@ -214,12 +181,11 @@ def main():
             description = json.load(openfile)
             file_list.append(",".join(description["file_names"]))
 
->>>>>>> fa06baf5c9b15b1090dc46ff202d480bd783e3f5
     with st.popover("Select index", help="👉 Select the datastore from which data will be retrieved"):
         st.session_state.selected_option = st.radio("Select a Document...", st.session_state.existing_indices, captions=file_list, index=0)
 
     st.write(f"*Selected index* : **:orange[{st.session_state.selected_option}]**")
-<<<<<<< HEAD
+
 
 
     if st.session_state.selected_option:
@@ -230,12 +196,6 @@ def main():
         st.warning("⚠️ No index present. Please add a new index.")
         st.page_link("pages/Upload_Files.py", label="Upload Files", icon="⬆️")
 
-
-
-
-
-=======
-    
     # Load the selected index from local storage
     if st.session_state.selected_option:
         st.session_state.book_docsearch = FAISS.load_local(f"db/{st.session_state.selected_option}", embeddings, allow_dangerous_deserialization=True)
@@ -244,10 +204,4 @@ def main():
     else:
         st.warning("⚠️ No index present. Please add a new index.")
         # st.page_link("pages/Upload_Files.py", label="Upload Files", icon="⬆️")
-            
-            
- 
-
-            
->>>>>>> fa06baf5c9b15b1090dc46ff202d480bd783e3f5
 main()

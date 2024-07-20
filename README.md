@@ -1,4 +1,4 @@
-# 💰 Basic-RAG-MutualFund-Report-Generator-and-Chatbot
+# 💰 RAG-MutualFund-Report-Generator-and-Chatbot
  
 This is a basic RAG chatbot and report generator made using LangChain, Streamlit, FAISS, Cohere's embed-english-v3.0 and Cohere's command-r
 

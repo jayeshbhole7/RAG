@@ -1,7 +1,5 @@
 # 💰 Basic-RAG-MutualFund-Report-Generator-and-Chatbot
-
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
- 
+ 
 This is a basic RAG chatbot and report generator made using LangChain, Streamlit, FAISS, Cohere's embed-english-v3.0 and Cohere's command-r
 
 The project is deployed on streamlit. Visit and try from this [link](https://chatfunds.streamlit.app/).
@@ -26,10 +24,10 @@ Worked with Python 3.11 anything above will probably work.
 
 1. Clone the repo
 
- ```sh
- git clone https://github.com/jojocoder28/Mutual_Fund_Chatbot
- ```
- ---
+ ```sh
+ git clone https://github.com/jayeshbhole7/RAG.git
+ ```
+ ---
 2. Create and activate virtual environment
 ```sh
 cd Mutual_Fund_Chatbot
@@ -37,9 +35,9 @@ python -m venv .venv
 .venv\Scripts\activate
 ```
 ---
- 3. Install Requirements
+ 3. Install Requirements
 
- ```sh
+ ```sh
 pip install -r requirements.txt
 ```
 ---
@@ -84,13 +82,12 @@ streamlit run .\Report_Generator.py
 - You can download the generated report in CSV format from the `Download CSV File` link.
 - You can also use the Chatbot
 #
- ![Chatbot](image/chatbot.png)
- #
+ ![Chatbot](image/chatbot.png)
+ #
 - If you want to know the what chunks were sent to the llm to generate the report, click on the `see chunks...` drop down.
 
 
 ## Contributors
-
-- [Swarnadeep Das](https://github.com/jojocoder28)
-- [Sukanta Bala](https://github.com/su1nta) 
-- [Areej Aasna](https://github.com/areejaasna) 
+RakshaChouhan
+DarshanSojitra
+KiranRathod

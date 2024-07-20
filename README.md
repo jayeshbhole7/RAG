@@ -1,4 +1,6 @@
-# 💰 RAG-MutualFund-Report-Generator-and-Chatbot
+# 💰 Basic-RAG-MutualFund-Report-Generator-and-Chatbot
+
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
  
 This is a basic RAG chatbot and report generator made using LangChain, Streamlit, FAISS, Cohere's embed-english-v3.0 and Cohere's command-r
 
@@ -25,7 +27,7 @@ Worked with Python 3.11 anything above will probably work.
 1. Clone the repo
 
  ```sh
- git clone https://github.com/jayeshbhole7/RAG.git
+ git clone https://github.com/jojocoder28/Mutual_Fund_Chatbot
  ```
  ---
 2. Create and activate virtual environment
@@ -88,6 +90,6 @@ streamlit run .\Report_Generator.py
 
 
 ## Contributors
-RakshaChouhan
-DarshanSojitra
-KiranRathod
+RakshaChouhan[link](https://github.com/Rakshachauhan-10)
+DarshanSojitra[link](https://github.com/Darshan-Sojitra)
+KiranRathod[link](https://github.com/kiranrathod0007)

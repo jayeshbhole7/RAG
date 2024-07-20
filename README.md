@@ -4,7 +4,7 @@
  
 This is a basic RAG chatbot and report generator made using LangChain, Streamlit, FAISS, Cohere's embed-english-v3.0 and Cohere's command-r
 
-The project is deployed on streamlit. Visit and try from this [link](https://chatfunds.streamlit.app/).
+The project is deployed on streamlit. Visit and try from this [link](https://jayeshbhole7-rag-report-generator-release-ijooq8.streamlit.app/).
 
 ## Features and Functionalities
 - You can upload multiple reports as PDF.

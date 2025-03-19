@@ -1,95 +1,186 @@
-# 💰 Basic-RAG-MutualFund-Report-Generator-and-Chatbot
+# Mutual Fund Chatbot
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
- 
-This is a basic RAG chatbot and report generator made using LangChain, Streamlit, FAISS, Cohere's embed-english-v3.0 and Cohere's command-r
+A retrieval-augmented generation (RAG) application designed to assist investors by providing insightful, personalized guidance through a conversational finance buddy. Analyze mutual fund data interactively through a user-friendly interface.
 
-The project is deployed on streamlit. Visit and try from this [link](https://chatfunds.streamlit.app/).
+![Chatbot Interface](vscode-file://vscode-app/e:/hackathon/image/chatbot.png)
 
-## Features and Functionalities
-- You can upload multiple reports as PDF.
-- Multiple indices can be added for better organization
-- You can select more than one `schemes` and `fields` as input
-- Generated report can be downloaded locally in CSV format for future references.
-- For development purposes, you can see the chunks retrieved from the vector database for the specific query
-- *Additional Feature* : There is a Chatbot as an option to generate your own personalized queries.
+## ✨ Features
 
-## Tech Stack
-- Language : `Python`
-- Libraries and Frameworks : `LangChain`, `PyPdf`, `Tabula`, `Streamlit`, `Pandas`
-- Models: Cohere's `embed-english-v3.0` and `command-r`
-- Database: `FAISS` Vector Database
+* **Friendly Finance Interface** : Built using Streamlit
+* Report Generator: Create structured mutual fund reports
+* Investment Buddy Chatbot: Answer investment queries naturally
+* File Uploader: Seamlessly upload PDF-based mutual fund reports
+* **Flexible Model Selection** : Choose between cloud and local LLMs:
+* Cohere Command-R (cloud)
+* Llama 3.1 8B (local)
+* Gemma 3 12B (local)
+* **Smart Data Processing** :
+* Extract text from financial PDFs
+* Organize data in a vector database (FAISS)
+* Generate structured financial reports
+* Download results as CSV
 
-## Setup on Local Machine
+## 🏗️ Technical Architecture
 
-Worked with Python 3.11 anything above will probably work.
+* **Vector Database** : FAISS for efficient similarity search
+* **Embedding Model** : Cohere's embed-english-v3.0
+* **Large Language Models** :
+* Primary: Cohere's command-r
+* Alternatives: Llama 3.1 (8B) and Gemma 3 (12B) via Ollama
+* **Data Processing** :
+* PDF extraction via PyPDF2
+* Text chunking via RecursiveCharacterTextSplitter
+* CSV data manipulation using pandas
 
-1. Clone the repo
+## 🚀 Installation and Setup
 
- ```sh
- git clone https://github.com/jojocoder28/Mutual_Fund_Chatbot
- ```
- ---
-2. Create and activate virtual environment
-```sh
-cd Mutual_Fund_Chatbot
-python -m venv .venv
-.venv\Scripts\activate
-```
----
- 3. Install Requirements
+### 1. Clone the Repository
 
- ```sh
+
+### 2. Create Virtual Environment
+
+Windows
+
+python -m venv venv
+venv\Scripts\activate
+
+Linux/Mac
+
+python -m venv venv
+source venv/bin/activate
+
+
+### 3. Install Dependencies
+
+
 pip install -r requirements.txt
-```
----
 
-4. For the local machine you need to uncomment the import tabula and tabula.convert_into(uploaded_file[0], f"db/{index_name}/table.csv",pages='all', output_format='csv') in the 141st line of pages/Upload_Files.py
 
----
 
-5. Create a .env file and put your [Cohere API Key](https://dashboard.cohere.com/api-keys) as COHERE_API_KEY and OpenAI API key as OPENAI_API_KEY
+### 4. API Keys
 
-```sh
-COHERE_API_KEY=[YOUR COHERE API KEY GOES HERE]
-```
+Create a `.env` file in the root directory:
 
-The chatbot uses Cohere's embed-english-v3.0 and command-r by default.
+COHERE_API_KEY=your_cohere_api_key
 
-##
-6. Run Chatbot.py
 
-```sh
+### 5. Setting Up Local LLMs with Ollama
+
+To use local models like Llama 3.1 and Gemma 3, you need to set up Ollama:
+
+
+1. Install Ollama from [ollama.ai](vscode-file://vscode-app/c:/Users/JAYESH%20BHOLE/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)
+2. Pull the models you want to use:
+
+Latest Llama 3.1 (8B parameter version)
+
+ollama pull llama3.1:8b
+
+Google's Gemma model (12B parameter version)
+
+ollama pull gemma:12b
+
+Run Ollama in the background before starting the app:
+
+
+Windows: Start in a separate terminal
+
+start ollama serve
+
+Linux/Mac:
+
+ollama serve &
+
+
+### 6. Launch the Application
+
 streamlit run .\Report_Generator.py
-```
-
----
-## Use
-
-- Navigate to **Upload Files** in the sidebar to upload your own PDFs (make sure the PDFs are readable)
-#
-![Upload](image/upload_files.png)
-#
-- Store the uploaded PDFs in a new or existing index.
-- Navigate to **Report Generator** and select the desired index (An index for the year 2022 is already created).
-- Select your scheme from the drop-down menu, or search in the search box
-#
-![Select Scheme](image/generate_report.png)
-#
-- Select the fields on which you want to generate a report on from the `Field` drop-down menu.
-- Click on `Generate`. The report from your query will be generated in a tabular form.
-#
-![Chatbot](image/report.png)
-#
-- You can download the generated report in CSV format from the `Download CSV File` link.
-- You can also use the Chatbot
-#
- ![Chatbot](image/chatbot.png)
- #
-- If you want to know the what chunks were sent to the llm to generate the report, click on the `see chunks...` drop down.
 
 
-## Contributors
-RakshaChouhan[link](https://github.com/Rakshachauhan-10)
-DarshanSojitra[link](https://github.com/Darshan-Sojitra)
-KiranRathod[link](https://github.com/kiranrathod0007)
+## 📊 Usage Instructions
+
+### Report Generator
+
+1. Select an index containing mutual fund data
+2. Choose specific mutual fund schemes
+3. Select data fields of interest
+4. Click "Generate" to create a report
+5. Download results as CSV
+
+### Chatbot
+
+1. Navigate to the Chatbot page
+2. Select a language model from the sidebar
+3. Ask investment-related questions
+4. View retrieved document chunks for transparency
+
+### Upload Files
+
+1. Go to the Upload Files page
+2. Upload PDF mutual fund reports
+3. Create a new index or add to existing one
+4. View and manage stored indices
+
+## 💡 Model Selection Guide
+
+* **Cohere Command-R** : Best for accurate financial responses (requires API key)
+* **Llama 3.1 (8B)** : Good balance of performance and speed for local usage
+* **Gemma 3 (12B)** : Best comprehensive responses for complex financial questions
+
+## 🛠️ Practical Applications
+
+### 1. Financial Advisory Tool
+
+* Client portfolio reviews and analysis
+* Risk profiling across fund categories
+* Generate custom reports for different investor types
+
+### 2. Investment Education Platform
+
+* Interactive Q&A about mutual fund categories
+* Extract market trends and insights
+* Build scenario analyses for investment strategies
+
+### 3. Research Automation
+
+* Compare metrics across similar funds
+* Track performance changes over time
+* Identify outlier funds with unusual metrics
+
+### 4. Content Creation
+
+* Generate first-draft research reports
+* Extract key statistics for investor newsletters
+* Create data-driven snippets about fund performance
+
+## 🔮 Future Enhancements
+
+* **Advanced Table Extraction** : Implement Tabula or Camelot for precise PDF data extraction
+* **Data Visualization** : Add interactive charts showing fund performance
+* **Multilingual Support** : Add support for regional languages
+* **Enhanced Analytics** : Implement comparative analysis across time periods
+* **User Authentication** : Add profile-based preferences and history
+
+## 📦 Dependencies
+
+* streamlit (User Interface)
+* langchain (LLM interaction framework)
+* faiss-cpu (Vector database)
+* cohere (Text embeddings & LLM API)
+* PyPDF2 (PDF processing)
+* pandas (Financial data manipulation)
+* ollama (Local LLM serving)
+
+## 🔗 Online Demo
+
+Available on Streamlit Cloud: [https://chatfunds.streamlit.app/](vscode-file://vscode-app/c:/Users/JAYESH%20BHOLE/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙌 Acknowledgements
+
+* Cohere for embedding and LLM APIs
+* Meta AI for Llama 3.1 model
+* Google for Gemma 3 model

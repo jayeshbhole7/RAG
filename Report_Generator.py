@@ -17,6 +17,7 @@ import re
 # import wget
 import tarfile
 # os.environ['JAVA_HOME'] = './jdk'
+from langchain_community.llms import Ollama
 
 
 # if "JAVA_HOME" not in os.environ:
@@ -39,11 +40,25 @@ st.set_page_config("Report Funds","🤖")
 load_dotenv()
 
 # API Keys
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+# OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 COHERE_API_KEY = os.getenv('COHERE_API_KEY')
 
+if 'selected_model' not in st.session_state:
+    st.session_state.selected_model = "cohere-command-r"
 
-
+def get_llm():
+    if st.session_state.selected_model == "cohere-command-r":
+        return ChatCohere(temperature=1, cohere_api_key=COHERE_API_KEY, model="command-r")
+    # elif st.session_state.selected_model == "ollama-llama2":
+    #     return Ollama(model="llama2")
+    # elif st.session_state.selected_model == "ollama-llama2-uncensored":
+    #     return Ollama(model="llama2-uncensored")
+    elif st.session_state.selected_model == "ollama-gemma-3-12b":
+        return Ollama(model="gemma:12b")
+    elif st.session_state.selected_model == "ollama-llama3.1":
+        return Ollama(model="llama3.1:8b")
+    else:
+        return ChatCohere(temperature=1, cohere_api_key=COHERE_API_KEY, model="command-r")
 
 
 
@@ -83,16 +98,15 @@ def field_retrieve(path):
 
 
 # Using Cohere's embed-english-v3.0 embedding model
-embeddings = CohereEmbeddings(cohere_api_key="Lqns8lzYYresnXB7QZ3Jc54zj8ri6X1Z6SDpgbZK", model="embed-english-v3.0")
-
+embeddings = CohereEmbeddings(cohere_api_key=COHERE_API_KEY, model="embed-english-v3.0")
 
 
 # For OpenAI's gpt-3.5-turbo llm
-# llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo", openai_api_key="AIzaSyCcw80TULxH1WieGfYMlDpBWyg8B4LPoDU")
+# llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo", openai_api_key=OPENAI_API_KEY)
 
 # For Cohere's command-r llm
-llm = ChatCohere(temperature=1, cohere_api_key="Lqns8lzYYresnXB7QZ3Jc54zj8ri6X1Z6SDpgbZK", model="command-r")
-
+# llm = ChatCohere(temperature=1, cohere_api_key=COHERE_API_KEY, model="command-r")
+llm=get_llm()
 
 # For reading PDFs and returning text string
 def read_pdf(files):
@@ -158,6 +172,7 @@ def chatbot():
             user_msg.write(user_text)
 
             with st.spinner("Getting Answer..."):
+                llm=get_llm()
                 # No of chunks the search should retrieve from the db
                 chunks_to_retrieve = 5
                 retriever = st.session_state.book_docsearch.as_retriever(search_type="similarity", search_kwargs={"k":chunks_to_retrieve})
@@ -230,15 +245,41 @@ def initial(flag=False):
 
 def main():
     initial(True)
+    
     # Streamlit UI
     st.title("💰 Mutual Fund Report Generator")
     
-    # For showing the index selector
-    file_list=[]
-    for index in st.session_state.existing_indices:
-        with open(f"db/{index}/desc.json", "r") as openfile:
-            description = json.load(openfile)
-            file_list.append(",".join(description["file_names"]))
+    # Add model selection to sidebar
+    with st.sidebar:
+        st.title("Model Settings")
+        model_option = st.selectbox(
+            "Choose Language Model",
+            # ["cohere-command-r", "ollama-llama2", "ollama-llama2-uncensored"],
+            ["cohere-command-r", "ollama-llama3.1", "ollama-gemma-3-12b"],
+            index=0
+        )
+        st.session_state.selected_model = model_option
+        
+        # Update the LLM if model selection changes
+        llm = get_llm()
+        
+        st.divider()
+        with st.expander("About the Models"):
+            st.markdown("""
+            - **Cohere Command-R**: Powerful model for precise responses
+            - **Ollama Llama3.1 (8B)**: Latest Llama model with improved financial understanding
+            - **Ollama Gemma 3 (12B)**: Google's powerful open model with strong reasoning
+            - **Ollama Llama2**: Local model for general text analysis
+            - **Ollama Llama2-Uncensored**: Local model with fewer restrictions
+            
+            > Note: To use Ollama models, you need to run Ollama in the background.
+            """)
+            # For showing the index selector
+            file_list=[]
+            for index in st.session_state.existing_indices:
+                with open(f"db/{index}/desc.json", "r") as openfile:
+                    description = json.load(openfile)
+                    file_list.append(",".join(description["file_names"]))
     
     
 

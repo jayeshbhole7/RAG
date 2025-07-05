@@ -4,3 +4,4 @@ myenv/
 *.pyc
 .vscode/settings.json
 tempCodeRunnerFile.py
+venv/

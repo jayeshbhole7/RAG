@@ -22,9 +22,17 @@ load_dotenv()
 # OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 COHERE_API_KEY = os.getenv('COHERE_API_KEY')
 
-# Using Cohere's embed-english-v3.0 embedding model
-embeddings = CohereEmbeddings(cohere_api_key=COHERE_API_KEY, model="embed-english-v3.0")
+if not COHERE_API_KEY:
+    st.error("cohere api key not found.")
+    st.stop()
 
+try:
+    
+    # Using Cohere's embed-english-v3.0 embedding model
+    embeddings = CohereEmbeddings(cohere_api_key=COHERE_API_KEY, model="embed-english-v3.0")
+except Exception as err:
+    st.error(f"error init cohere embedding:{str(err)}")
+    st.stop
 
 # For OpenAI's gpt-4.o-turbo llm
 # llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo" openai_api_key=OPENAI_API_KEY)

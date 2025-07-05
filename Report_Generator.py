@@ -179,7 +179,7 @@ def chatbot():
 
                 ## RetrievalQA Chain ##
                 qa = RetrievalQA.from_llm(llm=llm, retriever=retriever, verbose=True)
-                answer = qa({"query": exprompt})["result"]
+                answer = qa.invoke({"query": exprompt})["result"]
                 # answercsv = qa({"query": promptcsv})["result"]    #for generating csv file
                 
                 computer_text = f'''{answer}'''
